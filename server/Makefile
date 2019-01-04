@@ -37,5 +37,7 @@ IPCServer.o : IPCServer.c
 	$(CC) $(CFLAGS) -c IPCServer.c
 UnixIPCPipe.o : ../src/UnixIPCPipe.c
 	$(CC) $(CFLAGS) -c ../src/UnixIPCPipe.c
+
+.PHONY : clean
 clean :
-	rm unix_ipc_pipe IPCServer.o UnixIPCPipe.o
+	rm unix_ipc_pipe $(objects)
