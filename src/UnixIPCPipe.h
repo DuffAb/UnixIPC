@@ -9,7 +9,7 @@ enum ipc_type
 class IPCPipe
 {
 public:
-	IPCPipe(int ipc);
+	IPCPipe();
 	~IPCPipe();
 
 public:
@@ -20,7 +20,6 @@ public:
 	int OPipeCli();
 
 private:
-	int _ipc;
 	int _PipeSrvRead;
 	int _PipeSrvWrite;
 

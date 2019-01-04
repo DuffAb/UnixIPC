@@ -1,7 +1,17 @@
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h> // printf
+#include <fcntl.h> // open
+#include <errno.h> // errno
+#include <string.h>// strerror()
+#include <sys/types.h>
+#include <sys/wait.h>
+
+
 #include "UnixIPCType.h"
 #include "UnixIPCPipe.h"
 
-IPCPipe::IPCPipe(int ipc): _ipc(ipc)
+IPCPipe::IPCPipe()
 {
 	int uPipe[2];
 	pipe(uPipe); // 返回两个文件描述符，前者打开来读，后者打开来写
@@ -54,7 +64,7 @@ int IPCPipe::OPipeSrv()
 		/* error: must tell client */
 		snprintf(buff + n, sizeof(buff) - n, ": can't open, %s\n", strerror(errno));
 		n = strlen(buff);
-		Write(_PipeSrvWrite, buff, n);
+		write(_PipeSrvWrite, buff, n);
 
 	} 
 	else 
@@ -81,9 +91,9 @@ int IPCPipe::OPipeCli()
 		len--;				/* delete newline from fgets() */
 
 		/* 4write pathname to IPC channel */
-	write(writefd, buff, len);
+	write(_PipeCliWrite, buff, len);
 
 	/* read from IPC, write to standard output */
-	while ( (n = read(readfd, buff, MAXLINE)) > 0)
+	while ( (n = read(_PipeCliRead, buff, MAXLINE)) > 0)
 		write(STDOUT_FILENO, buff, n);
 }
