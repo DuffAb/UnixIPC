@@ -13,12 +13,8 @@ public:
 	~IPCPipe();
 
 public:
-	int OCreatePipeSrv();
-	int OCreatePipeCli();
-
-	int OPipeSrv();
-	int OPipeCli();
-
+	int ODerivePipeSrv();
+	
 private:
 	int _PipeSrvRead;
 	int _PipeSrvWrite;

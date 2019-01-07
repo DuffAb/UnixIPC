@@ -14,7 +14,7 @@ SRC = $(wildcard ${DIR_SRC}/*.cpp)
 DIR = $(notdir ${SRC})
 OBJ = $(patsubst %.cpp,${DIR_OBJ}/%.o,$(notdir ${SRC}))
 
-#TARGET = unix_ipc_pipe
+#TARGET = server
 
 #BIN_TARGET = ${DIR_BIN}/${target}
 
@@ -32,18 +32,20 @@ CFLAGS = -g -Wall
 #	find ${DIR_OBJ} -name *.o -exec rm -rf {}
 
 
-#声明伪目标 all，这个目标依赖 unix_ipc_pipe ，这样就可以生成多个程序
-all:unix_ipc_pipe
+#声明伪目标 all，这个目标依赖 server ，这样就可以生成多个程序
+all:server
 .PHONY : all
 
-objects = IPCServer.o UnixIPCPipe.o
-unix_ipc_pipe : $(objects)
-	$(CC) -o unix_ipc_pipe $(objects)
+objects = IPCServer.o UnixIPCPipe.o UnixIPCFifo.o
+server : $(objects)
+	$(CC) -o server $(objects)
 
 IPCServer.o : IPCServer.cpp
 	$(CC) $(CFLAGS) -c IPCServer.cpp
 UnixIPCPipe.o : ../src/UnixIPCPipe.cpp
 	$(CC) $(CFLAGS) -c ../src/UnixIPCPipe.cpp
+UnixIPCFifo.o : ../src/UnixIPCFifo.cpp
+	$(CC) $(CFLAGS) -c ../src/UnixIPCFifo.cpp
 
 ALL:
 	@echo $(SRC)
@@ -52,4 +54,4 @@ ALL:
 
 .PHONY : clean
 clean :
-	rm unix_ipc_pipe $(objects)
+	rm server $(objects)

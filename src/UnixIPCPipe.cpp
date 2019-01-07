@@ -1,14 +1,7 @@
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h> // printf
-#include <fcntl.h> // open
-#include <errno.h> // errno
-#include <string.h>// strerror()
 #include <sys/types.h>
-#include <sys/wait.h>
-
 
 #include "UnixIPCType.h"
+#include "UnixIPCComm.h"
 #include "UnixIPCPipe.h"
 
 IPCPipe::IPCPipe()
@@ -28,72 +21,21 @@ IPCPipe::~IPCPipe()
 
 }
 
-int IPCPipe::OCreatePipeSrv()
+int IPCPipe::ODerivePipeSrv()
 {
 	pid_t SrvPid;
 	if ((SrvPid = fork()) == 0)
 	{
 		close(_PipeCliWrite);
 		close(_PipeCliRead);
-		OPipeSrv();
+		OServer(_PipeSrvRead, _PipeSrvWrite);
 		exit(0);
 	}
 
 	close(_PipeSrvWrite);
 	close(_PipeSrvRead);
-	OPipeCli();
+	OClient(_PipeCliRead, _PipeCliWrite);
 	waitpid(SrvPid, NULL, 0);
 	exit(0);
 }
 
-int IPCPipe::OPipeSrv()
-{
-	int		fd;
-	ssize_t	n;
-	char	buff[MAXLINE + 1];
-
-	/* read pathname from IPC channel */
-	if ((n = read(_PipeSrvRead, buff, MAXLINE)) == 0)
-	{
-		printf("end-of-file while reading pathname");
-	}
-	buff[n] = '\0';		/* null terminate pathname */
-
-	if ((fd = open(buff, O_RDONLY)) < 0) 
-	{
-		/* error: must tell client */
-		snprintf(buff + n, sizeof(buff) - n, ": can't open, %s\n", strerror(errno));
-		n = strlen(buff);
-		write(_PipeSrvWrite, buff, n);
-
-	} 
-	else 
-	{
-		/* open succeeded: copy file to IPC channel */
-		while ( (n = read(fd, buff, MAXLINE)) > 0)
-		{
-			write(_PipeSrvWrite, buff, n);
-		}
-		close(fd);
-	}
-}
-
-int IPCPipe::OPipeCli()
-{
-	size_t	len;
-	ssize_t	n;
-	char	buff[MAXLINE];
-
-	/* read pathname */
-	fgets(buff, MAXLINE, stdin);
-	len = strlen(buff);		/* fgets() guarantees null byte at end */
-	if (buff[len-1] == '\n')
-		len--;				/* delete newline from fgets() */
-
-		/* 4write pathname to IPC channel */
-	write(_PipeCliWrite, buff, len);
-
-	/* read from IPC, write to standard output */
-	while ( (n = read(_PipeCliRead, buff, MAXLINE)) > 0)
-		write(STDOUT_FILENO, buff, n);
-}
