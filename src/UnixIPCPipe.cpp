@@ -12,8 +12,8 @@ IPCPipe::IPCPipe()
 	_PipeCliWrite = uPipe[1];
 
 	pipe(uPipe);
-	_PipeSrvWrite = uPipe[1];
 	_PipeCliRead  = uPipe[0];
+	_PipeSrvWrite = uPipe[1];
 }
 
 IPCPipe::~IPCPipe()
@@ -26,6 +26,7 @@ int IPCPipe::ODerivePipeSrv()
 	pid_t SrvPid;
 	if ((SrvPid = fork()) == 0)
 	{
+		printf("create pipe server.\n");
 		close(_PipeCliWrite);
 		close(_PipeCliRead);
 		OServer(_PipeSrvRead, _PipeSrvWrite);

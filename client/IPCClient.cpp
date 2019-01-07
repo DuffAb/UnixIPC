@@ -7,7 +7,7 @@ int main(int argc, char const *argv[])
 {
 	int ipc = 0;
 	printf("Select IPC: \n"
-		"\t0: PIPE\n"
+		//"\t0: PIPE\n"
 		"\t1: FIFO\n"
 		"\t2: 原始数据\n"
 		"\t3: 固件更新\n"
@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
 
 		case 1:{
 			IPCFifo fifo("/tmp/srv_r_cli_w.fifo", "/tmp/srv_w_cli_r.fifo");
-			fifo.OCreateFifoSrv();
+			fifo.OCreateFifoCli();
 			break;
 		}
 		

@@ -7,13 +7,14 @@ static int OServer(int r, int w)
 	ssize_t	n;
 	char	buff[MAXLINE + 1];
 
+	printf("OServer read 0\n");
 	/* read pathname from IPC channel */
 	if ((n = read(r, buff, MAXLINE)) == 0)
 	{
 		printf("end-of-file while reading pathname");
 	}
 	buff[n] = '\0';		/* null terminate pathname */
-
+	printf("OServer read 1\n");
 	if ((fd = open(buff, O_RDONLY)) < 0) 
 	{
 		/* error: must tell client */
@@ -45,9 +46,10 @@ static int OClient(int r, int w)
 	if (buff[len-1] == '\n')
 		len--;				/* delete newline from fgets() */
 
-		/* 4write pathname to IPC channel */
+	/* write pathname to IPC channel */
+	printf("OClient write buff(%s)\n", buff);
 	write(w, buff, len);
-
+	printf("OClient write 1\n");
 	/* read from IPC, write to standard output */
 	while ( (n = read(r, buff, MAXLINE)) > 0)
 		write(STDOUT_FILENO, buff, n);
